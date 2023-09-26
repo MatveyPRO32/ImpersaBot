@@ -1,3 +1,4 @@
 env.py
 тз.txt
 templates/
+__pycache__/

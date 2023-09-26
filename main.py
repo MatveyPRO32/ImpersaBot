@@ -130,36 +130,35 @@ def buttons_handler(call):
     if call.data.startswith("question"):
         clients[call.message.chat.id].new_message(call, call=True)
         return
-    match call.data:
-        case "start_filling_request":
-            clients[call.message.chat.id].generator = clients[
-                call.message.chat.id
-            ].fill_request()
-            next(clients[call.message.chat.id].generator)
-        case "ready":
-            content = "Результаты:\n\n"
-            for key, val in clients[call.message.chat.id].request.items():
-                content += key + " - " + val + "\n\n"
-            content += f"user id: {call.message.chat.id}"
-            with open(
-                f"requests\\{call.message.chat.id}.txt", "w", encoding="utf-8"
-            ) as f:
-                f.write(content)
+    if call.data == "start_filling_request":
+        clients[call.message.chat.id].generator = clients[
+            call.message.chat.id
+        ].fill_request()
+        next(clients[call.message.chat.id].generator)
+    if call.data ==  "ready":
+        content = "Результаты:\n\n"
+        for key, val in clients[call.message.chat.id].request.items():
+            content += key + " - " + val + "\n\n"
+        content += f"user id: {call.message.chat.id}"
+        with open(
+            f"requests\\{call.message.chat.id}.txt", "w", encoding="utf-8"
+        ) as f:
+            f.write(content)
 
-            for id_ in primary_chat_ids:
-                send_file(f"requests\\{call.message.chat.id}.txt", id_)
-                bot.send_message(
-                    id_,
-                    f"[ссылка](tg://user?id={call.message.chat.id})",
-                    parse_mode="Markdown",
-                )
-
+        for id_ in primary_chat_ids:
+            send_file(f"requests\\{call.message.chat.id}.txt", id_)
             bot.send_message(
-                call.message.chat.id,
-                "Отлично! Пришлите пожалуйста Ваше резюме и я передам его вместе с данной перепиской на утверждение руководителю бухгалтерской службы.",
+                id_,
+                f"[ссылка](tg://user?id={call.message.chat.id})",
+                parse_mode="Markdown",
             )
-        case "not_ready":
-            bot.reply_to(call.message, "Спасибо, были рады сотрудничеству!")
+
+        bot.send_message(
+            call.message.chat.id,
+            "Отлично! Пришлите пожалуйста Ваше резюме и я передам его вместе с данной перепиской на утверждение руководителю бухгалтерской службы.",
+        )
+    if call.data == "not_ready":
+        bot.reply_to(call.message, "Спасибо, были рады сотрудничеству!")
 
 
 @bot.message_handler(
